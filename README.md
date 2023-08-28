@@ -15,6 +15,20 @@ Ideal for applications that require modular and configurable task automation bas
 ## Getting Started
 
 ### Installation
+### Using .NET CLI
+
+```powershell
+dotnet add package Bijia.ActionTaskManager --version 1.0.0
+```
+### Using Package Manager Console
+```bash
+Install-Package Bijia.ActionTaskManager -Version 1.0.0
+```
+###  Using PackageReference in your project file
+Add the following line in your .csproj file:
+```xml
+<PackageReference Include="Bijia.ActionTaskManager" Version="1.0.0" />
+```
 
 ### Basic Registration
 To get started, you need to register the Bijia Action Task Manager in your application's dependency injection container.
