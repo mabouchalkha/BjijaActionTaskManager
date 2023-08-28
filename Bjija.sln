@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bjija.ActionTaskManager", "Bjija.ActionTaskManager\Bjija.ActionTaskManager.csproj", "{0FE5E3C6-CCBE-43D8-98C3-7E114E42E231}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bjija.ActionTaskManager.Tests", "Bjija.ActionTaskManager.Tests\Bjija.ActionTaskManager.Tests.csproj", "{0B2B317A-CD3F-4FA2-BC00-6561FB4C9C9A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FE5E3C6-CCBE-43D8-98C3-7E114E42E231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE5E3C6-CCBE-43D8-98C3-7E114E42E231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE5E3C6-CCBE-43D8-98C3-7E114E42E231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FE5E3C6-CCBE-43D8-98C3-7E114E42E231}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B2B317A-CD3F-4FA2-BC00-6561FB4C9C9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B2B317A-CD3F-4FA2-BC00-6561FB4C9C9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B2B317A-CD3F-4FA2-BC00-6561FB4C9C9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B2B317A-CD3F-4FA2-BC00-6561FB4C9C9A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E3701254-5C0E-4A0B-96AF-679BBA63C61B}
+	EndGlobalSection
+EndGlobal
