@@ -11,3 +11,5 @@ Bijia Action Task Manager is a flexible and extensible .NET library designed to 
 - **Logging and Monitoring**: Built-in support for task logging and event-based monitoring.
 
 Ideal for applications that require modular and configurable task automation based on various events or triggers.
+
+## Example Coming Soon
