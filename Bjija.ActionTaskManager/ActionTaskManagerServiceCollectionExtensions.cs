@@ -7,7 +7,7 @@ namespace Bjija.ActionTaskManager.Models
 {
     public static class ActionTaskManagerServiceCollectionExtensions
     {
-        public static IServiceCollection AddBijiaActionTaskManager(this IServiceCollection services, Action<ActionTaskManagerOptions> setupAction = null)
+        public static IServiceCollection AddBjijaActionTaskManager(this IServiceCollection services, Action<ActionTaskManagerOptions> setupAction = null)
         {
             var options = new ActionTaskManagerOptions();
             setupAction?.Invoke(options);
