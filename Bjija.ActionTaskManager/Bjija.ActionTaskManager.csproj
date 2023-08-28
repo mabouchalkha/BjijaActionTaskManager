@@ -4,6 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>BijiaActionTaskManager</Title>
+    <Authors>Mohamed Amine Bouchalkha</Authors>
+    <Description>Bijia Action Task Manager is a .NET library that enables seamless integration of actions and tasks. Easily register tasks, pipelines, and decorators to execute when specific actions occur. Ideal for event-driven architectures and workflow automation. Supports logging and conditional task execution</Description>
+    <PackageProjectUrl>https://github.com/mabouchalkha/BjijaActionTaskManager</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
