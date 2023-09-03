@@ -21,22 +21,22 @@ namespace Bjija.ActionTaskManager
             return _next;
         }
 
-        public async Task ExecuteChainAsync(object sender, ActionEventArgs<TData> args)
+        public async Task ExecuteChainAsync(ActionEventArgs<TData> args)
         {
             if (Predicate == null || Predicate(args))
             {
-                await ExecuteAsync(sender, args);
+                await ExecuteAsync(args);
             }
 
             if (_next != null)
             {
                 if (_next.Predicate == null || _next.Predicate(args))
                 {
-                    await _next.ExecuteChainAsync(sender, args);
+                    await _next.ExecuteChainAsync(args);
                 }
             }
         }
 
-        public abstract Task ExecuteAsync(object sender, ActionEventArgs<TData> args);
+        public abstract Task ExecuteAsync(ActionEventArgs<TData> args);
     }
 }

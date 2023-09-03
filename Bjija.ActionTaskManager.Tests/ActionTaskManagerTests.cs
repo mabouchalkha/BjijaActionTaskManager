@@ -29,10 +29,10 @@ namespace Bjija.ActionTaskManager.Tests
             await taskManager.LinkActionToTasksAsync(userLoginAction);
 
             // Add debug logs
-            userLoginAction.ActionOccurred += (sender, args) => {
+            userLoginAction.ActionOccurred += (args) => {
                 Console.WriteLine("Event fired");
             };
-            mockTask.When(x => x.ExecuteAsync(Arg.Any<object>(), Arg.Any<ActionEventArgs<Payload>>()))
+            mockTask.When(x => x.ExecuteAsync(Arg.Any<ActionEventArgs<Payload>>()))
                     .Do(x => {
                         Console.WriteLine("ExecuteAsync called");
                     });
@@ -40,7 +40,7 @@ namespace Bjija.ActionTaskManager.Tests
             userLoginAction.UserLoggedIn(new Payload());
 
             // Assert
-            await mockTask.Received(1).ExecuteAsync(Arg.Any<object>(), Arg.Any<ActionEventArgs<Payload>>());
+            await mockTask.Received(1).ExecuteAsync(Arg.Any<ActionEventArgs<Payload>>());
         }
         [Fact]
         public async Task UserLoginAction_ShouldTrigger_WelcomeEmailTask()
@@ -62,7 +62,7 @@ namespace Bjija.ActionTaskManager.Tests
             userLoginAction.UserLoggedIn(new Payload());
 
             // Assert
-            await mockTask.Received(1).ExecuteAsync(Arg.Any<object>(), Arg.Any<ActionEventArgs<Payload>>());
+            await mockTask.Received(1).ExecuteAsync(Arg.Any<ActionEventArgs<Payload>>());
         }
 
         [Fact]
@@ -88,8 +88,8 @@ namespace Bjija.ActionTaskManager.Tests
             await userProfileAction.ChooseProfile("Comptable-flow");
 
             // Assert
-            await mockTask1.Received(1).ExecuteAsync(Arg.Any<object>(), Arg.Any<ActionEventArgs<Payload>>());
-            await mockTask2.Received(1).ExecuteAsync(Arg.Any<object>(), Arg.Any<ActionEventArgs<Payload>>());
+            await mockTask1.Received(1).ExecuteAsync(Arg.Any<ActionEventArgs<Payload>>());
+            await mockTask2.Received(1).ExecuteAsync(Arg.Any<ActionEventArgs<Payload>>());
         }
 
     }
@@ -98,11 +98,11 @@ namespace Bjija.ActionTaskManager.Tests
     {
         public string ProfileName => null;// or "";
 
-        public event EventHandler<ActionEventArgs<Payload>> ActionOccurred;
+        public Action<ActionEventArgs<Payload>> ActionOccurred { get; set; }
 
         public void UserLoggedIn(Payload payload)
         {
-            ActionOccurred?.Invoke(this, new ActionEventArgs<Payload>(payload));
+            ActionOccurred?.Invoke(new ActionEventArgs<Payload>(payload));
 
         }
     }
@@ -116,13 +116,13 @@ namespace Bjija.ActionTaskManager.Tests
             _payload = payload;
         }
 
-        public event EventHandler<ActionEventArgs<Payload>> ActionOccurred;
+        public Action<ActionEventArgs<Payload>> ActionOccurred { get; set; }
 
         public string ProfileName { get; private set; }
 
         public async Task ChooseProfile(string profileData)
         {
-            ActionOccurred?.Invoke(this, new ActionEventArgs<Payload>(_payload));
+            ActionOccurred?.Invoke(new ActionEventArgs<Payload>(_payload));
         }
     }
 
@@ -136,7 +136,7 @@ namespace Bjija.ActionTaskManager.Tests
 
     public class TestExampleTask : Task<Payload>
     {
-        protected override async Task ExecuteCoreAsync(object sender, ActionEventArgs<Payload> args)
+        protected override async Task ExecuteCoreAsync(ActionEventArgs<Payload> args)
         {
             string username = args.Data.Email;
             await SendEmailAsync(username);
@@ -152,7 +152,7 @@ namespace Bjija.ActionTaskManager.Tests
 
     public class TestExampleTask2 : Task<Payload>
     {
-        protected override async Task ExecuteCoreAsync(object sender, ActionEventArgs<Payload> args)
+        protected override async Task ExecuteCoreAsync(ActionEventArgs<Payload> args)
         {
             string username = args.Data.Email;
             await SendEmailAsync(username);

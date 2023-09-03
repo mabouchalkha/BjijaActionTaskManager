@@ -15,7 +15,7 @@ namespace Bjija.ActionTaskManager.Decorators
             _logger = logger;
         }
 
-        protected override async Task ExecuteCoreAsync(object sender, ActionEventArgs<T> args)
+        protected override async Task ExecuteCoreAsync(ActionEventArgs<T> args)
         {
             var taskName = _decoratedTask.GetType().Name;
             var dataInfo = args != null ? SerializeObjectToString(args.Data) : "No data";
@@ -26,7 +26,7 @@ namespace Bjija.ActionTaskManager.Decorators
 
             try
             {
-                await _decoratedTask.ExecuteAsync(sender, args);
+                await _decoratedTask.ExecuteAsync(args);
             }
             catch (Exception ex)
             {

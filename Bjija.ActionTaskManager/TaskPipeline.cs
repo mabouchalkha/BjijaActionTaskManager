@@ -7,9 +7,9 @@ namespace Bjija.ActionTaskManager
 {
     public class TaskPipeline<TData> : ITaskPipeline<TData>
     {
-        public event EventHandler<PipelineEventArgs<TData>> PipelineStarted;
-        public event EventHandler<PipelineEventArgs<TData>> PipelineCompleted;
-        public event EventHandler<PipelineErrorEventArgs<TData>> PipelineFailed;
+        public Action<PipelineEventArgs<TData>> PipelineStarted { get; set; }
+        public Action<PipelineEventArgs<TData>> PipelineCompleted { get; set; }
+        public Action<PipelineErrorEventArgs<TData>> PipelineFailed { get; set; }
 
         private readonly SortedList<int, IChainableTask<TData>> _tasks = new();
         private readonly ILogger<TaskPipeline<TData>> _logger;
@@ -37,14 +37,14 @@ namespace Bjija.ActionTaskManager
             _tasks[key] = newTask;
         }
 
-        public async Task ExecutePipelineAsync(object sender, ActionEventArgs<TData> args)
+        public async Task ExecutePipelineAsync(ActionEventArgs<TData> args)
         {
             _logger.LogInformation("Executing pipeline...");
 
             // TODO: Start a transaction here, if needed
             try
             {
-                PipelineStarted?.Invoke(this, new PipelineEventArgs<TData>(args.Data));
+                PipelineStarted?.Invoke(new PipelineEventArgs<TData>(args.Data));
 
                 IChainableTask<TData> firstTask = null;
                 IChainableTask<TData> lastTask = null;
@@ -64,14 +64,14 @@ namespace Bjija.ActionTaskManager
 
                 if (firstTask != null)
                 {
-                    await firstTask.ExecuteChainAsync(sender, args);
+                    await firstTask.ExecuteChainAsync(args);
                 }
 
-                PipelineCompleted?.Invoke(this, new PipelineEventArgs<TData>(args.Data));
+                PipelineCompleted?.Invoke(new PipelineEventArgs<TData>(args.Data));
             }
             catch (Exception ex)
             {
-                PipelineFailed?.Invoke(this, new PipelineErrorEventArgs<TData>(args.Data, ex));
+                PipelineFailed?.Invoke(new PipelineErrorEventArgs<TData>(args.Data, ex));
                 _logger.LogError(ex, "Error executing task: {TaskName}", ex.ToString());
                 // TODO: Handle error, e.g., rollback transaction
                 throw;

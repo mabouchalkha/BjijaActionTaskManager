@@ -191,7 +191,7 @@ namespace Bjija.ActionTaskManager
 
             if (_pipelines.TryGetValue(actionType, out var pipelineObj) && pipelineObj is ITaskPipeline<TData> pipeline)
             {
-                action.ActionOccurred += async (sender, args) => await pipeline.ExecutePipelineAsync(sender, args).ConfigureAwait(false);
+                action.ActionOccurred += async args => await pipeline.ExecutePipelineAsync(args).ConfigureAwait(false);
             }
 
             if (!string.IsNullOrEmpty(profileName) && _profileConfiguration.ContainsKey(profileName))
@@ -207,11 +207,11 @@ namespace Bjija.ActionTaskManager
                         }
 
                         task = DecorateTask(task, _universalDecorators);
-                        action.ActionOccurred += async (sender, args) =>
+                        action.ActionOccurred += async args =>
                         {
                             if (predicate == null || predicate(args))
                             {
-                                await task.ExecuteAsync(sender, args).ConfigureAwait(false);
+                                await task.ExecuteAsync(args).ConfigureAwait(false);
                             }
                         };
                     }
@@ -231,11 +231,11 @@ namespace Bjija.ActionTaskManager
                         predicate = args => storedPredicate(args);
                     }
 
-                    action.ActionOccurred += async (sender, args) =>
+                    action.ActionOccurred += async args =>
                     {
                         if (predicate == null || predicate(args))
                         {
-                            await taskInstance.ExecuteAsync(sender, args).ConfigureAwait(false);
+                            await taskInstance.ExecuteAsync(args).ConfigureAwait(false);
                         }
                     };
                 }

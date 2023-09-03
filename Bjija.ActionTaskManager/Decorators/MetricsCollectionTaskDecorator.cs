@@ -23,10 +23,10 @@ namespace Bjija.ActionTaskManager.Decorators
             _metricsService = metricsService ?? throw new ArgumentNullException(nameof(metricsService));
         }
 
-        protected override async Task ExecuteCoreAsync(object sender, ActionEventArgs<T> args)
+        protected override async Task ExecuteCoreAsync(ActionEventArgs<T> args)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            await _decoratedTask.ExecuteAsync(sender, args);
+            await _decoratedTask.ExecuteAsync(args);
             watch.Stop();
 
             _metricsService.Collect($"{typeof(T).Name}.ExecutionTime", watch.ElapsedMilliseconds);

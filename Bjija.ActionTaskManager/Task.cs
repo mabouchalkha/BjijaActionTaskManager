@@ -16,14 +16,14 @@ namespace Bjija.ActionTaskManager
             Predicate = predicate;
         }
 
-        public virtual async Task ExecuteAsync(object sender, ActionEventArgs<TData> args)
+        public virtual async Task ExecuteAsync(ActionEventArgs<TData> args)
         {
             if (Predicate == null || Predicate(args))
             {
-                await ExecuteCoreAsync(sender, args);
+                await ExecuteCoreAsync(args);
             }
         }
 
-        protected abstract Task ExecuteCoreAsync(object sender, ActionEventArgs<TData> args);
+        protected abstract Task ExecuteCoreAsync(ActionEventArgs<TData> args);
     }
 }
