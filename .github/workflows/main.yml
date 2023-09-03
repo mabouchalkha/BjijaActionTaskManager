@@ -23,7 +23,18 @@ jobs:
         
     - name: Execute unit tests
       run: dotnet test
-      
+
+    - name: Extract Version from csproj
+      id: extract_version
+      run: |
+        # Use grep and awk to extract the version
+        version=$(grep -oP "<Version>\K(.*?)(?=<)" ./YourProject/YourProject.csproj)
+        echo "Current version: $version"
+        # Use awk to increment the minor version
+        new_version=$(echo $version | awk -F. -v OFS=. '{$2++;} 1')
+        echo "New version: $new_version"
+        echo "PACKAGE_VERSION=$new_version" >> $GITHUB_ENV
+        
     - name: Restore dependencies
       run: dotnet restore
 
@@ -33,14 +44,13 @@ jobs:
     # Automatically update version number here if you need. Otherwise, manage it manually in your .csproj file
     
     - name: Pack
-      run: dotnet pack --configuration Release --no-build -o out /p:PackageVersion=${{ github.run_number }} # You can adjust versioning strategy
+      run: dotnet pack --configuration Release --no-build -o out /p:PackageVersion=${{ env.PACKAGE_VERSION  }} # You can adjust versioning strategy
 
     - name: List directory
       run: ls -R out/
 
     - name: Push to NuGet
-      run: dotnet nuget push out/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
-
-      
-    - name: Push NuGet package
-      run: dotnet nuget push out/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: |
+        $package = Get-ChildItem -Path ./out/ -Filter *.nupkg | Select-Object -First 1
+        dotnet nuget push $package.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      shell: pwsh
