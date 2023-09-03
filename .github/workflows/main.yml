@@ -21,16 +21,16 @@ jobs:
       with:
         dotnet-version: '6.x' # Adjust this to your project's .NET version
         
-    #- name: Execute unit tests
-    #  run: dotnet test
+    - name: Execute unit tests
+      run: dotnet test
+    
     - name: List directory contents
       run: Get-ChildItem -Recurse
       shell: pwsh
 
-
     - name: Extract Version from csproj
       run: |
-        $xml = [xml](Get-Content ./BjijaActionTaskManager/BjijaActionTaskManager.csproj)
+        $xml = [xml](Get-Content ./Bjija.ActionTaskManager/Bjija.ActionTaskManager.csproj)
         $version = $xml.Project.PropertyGroup.Version
         $splitVersion = $version -split '\.'
         $major = [int]$splitVersion[0]
@@ -38,7 +38,7 @@ jobs:
         $patch = [int]$splitVersion[2]
         $newVersion = "$major.$minor.$patch"
         $xml.Project.PropertyGroup.Version = $newVersion
-        $xml.Save("./BjijaActionTaskManager/BjijaActionTaskManager.csproj")
+        $xml.Save("./Bjija.ActionTaskManager/Bjija.ActionTaskManager.csproj")
         echo "PACKAGE_VERSION=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
         
     - name: Restore dependencies
