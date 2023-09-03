@@ -28,7 +28,7 @@ jobs:
       id: extract_version
       run: |
         # Use grep and awk to extract the version
-        version=$(grep -oP "<Version>\K(.*?)(?=<)" ./YourProject/YourProject.csproj)
+        version=$(grep -oP "<Version>\K(.*?)(?=<)" ./BjijaActionTaskManager/BjijaActionTaskManager.csproj)
         echo "Current version: $version"
         # Use awk to increment the minor version
         new_version=$(echo $version | awk -F. -v OFS=. '{$2++;} 1')
