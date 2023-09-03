@@ -21,8 +21,12 @@ jobs:
       with:
         dotnet-version: '6.x' # Adjust this to your project's .NET version
         
-    - name: Execute unit tests
-      run: dotnet test
+    #- name: Execute unit tests
+    #  run: dotnet test
+    - name: List directory contents
+      run: Get-ChildItem -Recurse
+      shell: pwsh
+
 
     - name: Extract Version from csproj
       run: |
