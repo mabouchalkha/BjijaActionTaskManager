@@ -26,7 +26,7 @@ jobs:
       
     - name: Restore dependencies
       run: dotnet restore
-    
+
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
@@ -34,6 +34,13 @@ jobs:
     
     - name: Pack
       run: dotnet pack --configuration Release --no-build -o out /p:PackageVersion=${{ github.run_number }} # You can adjust versioning strategy
-    
+
+    - name: List directory
+      run: ls -R out/
+
+    - name: Push to NuGet
+      run: dotnet nuget push out/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+      
     - name: Push NuGet package
       run: dotnet nuget push out/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
