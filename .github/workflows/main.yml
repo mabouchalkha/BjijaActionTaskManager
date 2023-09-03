@@ -4,21 +4,26 @@ on:
   push:
     branches:
       - master # Trigger the action only when code is pushed to the main branch
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
   build:
     
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '6.x' # Adjust this to your project's .NET version
-    
+        
+    - name: Execute unit tests
+      run: dotnet test
+      
     - name: Restore dependencies
       run: dotnet restore
     
