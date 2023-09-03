@@ -25,15 +25,17 @@ jobs:
       run: dotnet test
 
     - name: Extract Version from csproj
-      id: extract_version
       run: |
-        # Use grep and awk to extract the version
-        version=$(grep -oP "<Version>\K(.*?)(?=<)" ./BjijaActionTaskManager/BjijaActionTaskManager.csproj)
-        echo "Current version: $version"
-        # Use awk to increment the minor version
-        new_version=$(echo $version | awk -F. -v OFS=. '{$2++;} 1')
-        echo "New version: $new_version"
-        echo "PACKAGE_VERSION=$new_version" >> $GITHUB_ENV
+        $xml = [xml](Get-Content ./BjijaActionTaskManager/BjijaActionTaskManager.csproj)
+        $version = $xml.Project.PropertyGroup.Version
+        $splitVersion = $version -split '\.'
+        $major = [int]$splitVersion[0]
+        $minor = [int]$splitVersion[1] + 1
+        $patch = [int]$splitVersion[2]
+        $newVersion = "$major.$minor.$patch"
+        $xml.Project.PropertyGroup.Version = $newVersion
+        $xml.Save("./BjijaActionTaskManager/BjijaActionTaskManager.csproj")
+        echo "PACKAGE_VERSION=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
         
     - name: Restore dependencies
       run: dotnet restore
@@ -44,7 +46,7 @@ jobs:
     # Automatically update version number here if you need. Otherwise, manage it manually in your .csproj file
     
     - name: Pack
-      run: dotnet pack --configuration Release --no-build -o out /p:PackageVersion=${{ env.PACKAGE_VERSION  }} # You can adjust versioning strategy
+      run: dotnet pack --configuration Release --no-build -o out /p:PackageVersion=${{ env.PACKAGE_VERSION }} # You can adjust versioning strategy
 
     - name: List directory
       run: ls -R out/
