@@ -8,6 +8,7 @@
     <Authors>Mohamed Amine Bouchalkha</Authors>
     <Description>Bjija Action Task Manager is a .NET library that enables seamless integration of actions and tasks. Easily register tasks, pipelines, and decorators to execute when specific actions occur. Ideal for event-driven architectures and workflow automation. Supports logging and conditional task execution</Description>
     <PackageProjectUrl>https://github.com/mabouchalkha/BjijaActionTaskManager</PackageProjectUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
