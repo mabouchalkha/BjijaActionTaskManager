@@ -1,6 +1,6 @@
-# Bijia Action Task Manager
+# Bjija Action Task Manager
 
-Bijia Action Task Manager is a flexible and extensible .NET library designed to streamline the task execution pipeline based on various action triggers. It provides a clean abstraction for associating tasks with actions, allowing developers to automate workflows and perform asynchronous operations seamlessly.
+Bjija Action Task Manager is a flexible and extensible .NET library designed to streamline the task execution pipeline based on various action triggers. It provides a clean abstraction for associating tasks with actions, allowing developers to automate workflows and perform asynchronous operations seamlessly.
 
 ## Key Features
 
@@ -18,25 +18,25 @@ Ideal for applications that require modular and configurable task automation bas
 ### Using .NET CLI
 
 ```powershell
-dotnet add package Bijia.ActionTaskManager --version 1.0.0
+dotnet add package Bjija.ActionTaskManager --version 1.0.0
 ```
 ### Using Package Manager Console
 ```bash
-Install-Package Bijia.ActionTaskManager -Version 1.0.0
+Install-Package Bjija.ActionTaskManager -Version 1.0.0
 ```
 ###  Using PackageReference in your project file
 Add the following line in your .csproj file:
 ```xml
-<PackageReference Include="Bijia.ActionTaskManager" Version="1.0.0" />
+<PackageReference Include="Bjija.ActionTaskManager" Version="1.0.0" />
 ```
 
 ### Basic Registration
-To get started, you need to register the Bijia Action Task Manager in your application's dependency injection container.
-Register the Bijia Action Task Manager in the `Startup.cs` or equivalent configuration file:
+To get started, you need to register the Bjija Action Task Manager in your application's dependency injection container.
+Register the Bjija Action Task Manager in the `Startup.cs` or equivalent configuration file:
 
 ```csharp
 var services = new ServiceCollection();
-services.AddBijiaActionTaskManager();
+services.AddBjijaActionTaskManager();
 ```
 
 ### Enabling Logging Decorators
@@ -44,7 +44,7 @@ services.AddBijiaActionTaskManager();
 You can enable logging decorators for all tasks by setting the `EnableLoggingDecorator` option to `true`.
 
 ```csharp
-services.AddBijiaActionTaskManager(options =>
+services.AddBjijaActionTaskManager(options =>
 {
     options.EnableLoggingDecorator = true;
 });
@@ -70,13 +70,13 @@ services.AddLogging(builder =>
 If you want to plug in any logger that implements `ILogger`, you can set the `LoggerFactory` option:
 
 ```csharp
-services.AddBijiaActionTaskManager(options =>
+services.AddBjijaActionTaskManager(options =>
 {
     options.EnableLoggingDecorator = false;
     options.LoggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(); });
 });
 ```
-## Bijia Action Task Manager Examples
+## Bjija Action Task Manager Examples
 
 ### Basics: Implementing Interfaces and Base Classes
 
@@ -272,7 +272,7 @@ var eCommercePipeline = serviceProvider.GetRequiredService<ITaskPipeline<OrderDa
 ```
 #### Registering Tasks in the Pipeline
 
-The concept of a task pipeline in Bijia Action Task Manager is analogous to the middleware pipeline in ASP.NET Core. Just like middleware, tasks in a pipeline are executed in a specific order determined by their priority. They all share and consume the same payload, allowing one task to prepare data or set states that the following task can then use.
+The concept of a task pipeline in Bjija Action Task Manager is analogous to the middleware pipeline in ASP.NET Core. Just like middleware, tasks in a pipeline are executed in a specific order determined by their priority. They all share and consume the same payload, allowing one task to prepare data or set states that the following task can then use.
 In the task pipeline, all tasks consume the same payload. For example, in a pipeline handling `OrderData`, the `ValidateCustomer` task might validate the customer details and mark the order as validated. The next task, `AdjustInventory`, can then use this validated flag to proceed with its own operations.
 
 Tasks can be registered in the pipeline with priority and an optional predicate for conditional execution.
