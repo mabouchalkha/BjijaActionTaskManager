@@ -1,8 +1,8 @@
-using Bjija.ActionTaskManager.Helpers;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Helpers;
+using Bjija.TaskOrchestrator.Models;
 using NSubstitute;
 
-namespace Bjija.ActionTaskManager.Tests
+namespace Bjija.TaskOrchestrator.Tests
 {
     public class ActionTaskManagerTests
     {
@@ -10,18 +10,18 @@ namespace Bjija.ActionTaskManager.Tests
         public async Task TestTaskExecutionOnAction()
         {
             // Arrange
-            var mockTask = Substitute.For<ITask<Payload>>();
+            var mockTask = Substitute.For<IActionTask<Payload>>();
             var mockTaskFactory = Substitute.For<ITaskFactory>();
             var mockPipelineFactory = Substitute.For<ITaskPipelineFactory>();
-            var taskManagerOptions = new ActionTaskManagerOptions();
+            var taskManagerOptions = new TaskOrchestratorOptions();
 
             // Configure task factory to return the mock task when a specific task type is requested
-            mockTaskFactory.Create<ITask<Payload>>(typeof(TestExampleTask)).Returns(mockTask);
+            mockTaskFactory.Create<IActionTask<Payload>>(typeof(TestExampleTask)).Returns(mockTask);
 
-            var taskManager = new ActionTaskManager(taskManagerOptions, mockTaskFactory, mockPipelineFactory);
+            var taskManager = new TaskOrchestrator(taskManagerOptions, mockTaskFactory, mockPipelineFactory);
 
             // Register task to action
-            taskManager.Register<UserLoginAction, Payload, TestExampleTask>();
+            taskManager.RegisterTask<UserLoginAction, Payload, TestExampleTask>();
 
             var userLoginAction = new UserLoginAction();
 
@@ -46,14 +46,14 @@ namespace Bjija.ActionTaskManager.Tests
         public async Task UserLoginAction_ShouldTrigger_WelcomeEmailTask()
         {
             // Arrange
-            var mockTask = Substitute.For<ITask<Payload>>();
+            var mockTask = Substitute.For<IActionTask<Payload>>();
             var mockTaskFactory = Substitute.For<ITaskFactory>();
             var mockPipelineFactory = Substitute.For<ITaskPipelineFactory>();
-            var taskManagerOptions = new ActionTaskManagerOptions();
-            mockTaskFactory.Create<ITask<Payload>>(typeof(TestExampleTask)).Returns(mockTask);
+            var taskManagerOptions = new TaskOrchestratorOptions();
+            mockTaskFactory.Create<IActionTask<Payload>>(typeof(TestExampleTask)).Returns(mockTask);
 
-            var taskManager = new ActionTaskManager(taskManagerOptions, mockTaskFactory, mockPipelineFactory);
-            taskManager.Register<UserLoginAction, Payload, TestExampleTask>();
+            var taskManager = new TaskOrchestrator(taskManagerOptions, mockTaskFactory, mockPipelineFactory);
+            taskManager.RegisterTask<UserLoginAction, Payload, TestExampleTask>();
 
             var userLoginAction = new UserLoginAction();
             await taskManager.LinkActionToTasksAsync(userLoginAction);
@@ -69,15 +69,15 @@ namespace Bjija.ActionTaskManager.Tests
         public async Task UserProfileChoiceAction_ShouldTrigger_ComptableTasks()
         {
             // Arrange
-            var mockTask1 = Substitute.For<ITask<Payload>>();
-            var mockTask2 = Substitute.For<ITask<Payload>>();
+            var mockTask1 = Substitute.For<IActionTask<Payload>>();
+            var mockTask2 = Substitute.For<IActionTask<Payload>>();
             var mockTaskFactory = Substitute.For<ITaskFactory>();
             var mockPipelineFactory = Substitute.For<ITaskPipelineFactory>();
-            var taskManagerOptions = new ActionTaskManagerOptions();
-            mockTaskFactory.Create<ITask<Payload>>(typeof(TestExampleTask)).Returns(mockTask1);
-            mockTaskFactory.Create<ITask<Payload>>(typeof(TestExampleTask2)).Returns(mockTask2);
+            var taskManagerOptions = new TaskOrchestratorOptions();
+            mockTaskFactory.Create<IActionTask<Payload>>(typeof(TestExampleTask)).Returns(mockTask1);
+            mockTaskFactory.Create<IActionTask<Payload>>(typeof(TestExampleTask2)).Returns(mockTask2);
 
-            var taskManager = new ActionTaskManager(taskManagerOptions, mockTaskFactory, mockPipelineFactory);
+            var taskManager = new TaskOrchestrator(taskManagerOptions, mockTaskFactory, mockPipelineFactory);
             taskManager.RegisterProfileTask("Comptable-flow", mockTask1);
             taskManager.RegisterProfileTask("Comptable-flow", mockTask2);
 
@@ -134,7 +134,7 @@ namespace Bjija.ActionTaskManager.Tests
         public double Salary { get; set; }
     }
 
-    public class TestExampleTask : Task<Payload>
+    public class TestExampleTask : ActionTask<Payload>
     {
         protected override async Task ExecuteCoreAsync(ActionEventArgs<Payload> args)
         {
@@ -150,7 +150,7 @@ namespace Bjija.ActionTaskManager.Tests
         }
     }
 
-    public class TestExampleTask2 : Task<Payload>
+    public class TestExampleTask2 : ActionTask<Payload>
     {
         protected override async Task ExecuteCoreAsync(ActionEventArgs<Payload> args)
         {

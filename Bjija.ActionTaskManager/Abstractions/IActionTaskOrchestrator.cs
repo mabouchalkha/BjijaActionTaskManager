@@ -1,18 +1,18 @@
-﻿using Bjija.ActionTaskManager.Models;
+﻿using Bjija.TaskOrchestrator.Models;
 
-namespace Bjija.ActionTaskManager.Abstractions
+namespace Bjija.TaskOrchestrator.Abstractions
 {
     /// <summary>
     /// Defines methods for managing tasks based on triggered actions.
     /// </summary>
-    public interface IActionTaskManager
+    public interface IActionTaskOrchestrator
     {
         /// <summary>
         /// Adds a universal decorator that will be applied to all tasks.
         /// </summary>
         /// <param name="decoratorType">The type of the decorator.</param>
         /// <returns>The current IActionTaskManager instance.</returns>
-        IActionTaskManager AddUniversalDecorator(Type decoratorType);
+        IActionTaskOrchestrator AddUniversalDecorator(Type decoratorType);
 
         /// <summary>
         /// Registers a task to be executed when a specific action is triggered.
@@ -22,9 +22,9 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <typeparam name="TTask">The type of the task.</typeparam>
         /// <param name="decoratorTypes">An array of decorator types to apply to the task.</param>
         /// <returns>The current IActionTaskManager instance.</returns>
-        IActionTaskManager Register<TAction, TData, TTask>(params Type[] decoratorTypes)
+        IActionTaskOrchestrator RegisterTask<TAction, TData, TTask>(params Type[] decoratorTypes)
                         where TAction : IActionTrigger<TData>
-                        where TTask : ITask<TData>, new();
+                        where TTask : IActionTask<TData>, new();
 
         /// <summary>
         /// Registers a task with a condition to be executed when a specific action is triggered.
@@ -35,9 +35,9 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <param name="predicate">A function to determine whether the task should be executed.</param>
         /// <param name="decoratorTypes">An array of decorator types to apply to the task.</param>
         /// <returns>The current IActionTaskManager instance.</returns>
-        IActionTaskManager Register<TAction, TData, TTask>(Func<ActionEventArgs<TData>, bool> predicate, params Type[] decoratorTypes)
+        IActionTaskOrchestrator RegisterTask<TAction, TData, TTask>(Func<ActionEventArgs<TData>, bool> predicate, params Type[] decoratorTypes)
                         where TAction : IActionTrigger<TData>
-                        where TTask : ITask<TData>, new();
+                        where TTask : IActionTask<TData>, new();
 
         /// <summary>
         /// Unregisters a specific task for a specific action.
@@ -46,7 +46,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <typeparam name="TData">The type of the data payload.</typeparam>
         /// <typeparam name="TTask">The type of the task.</typeparam>
         /// <returns>The current IActionTaskManager instance.</returns>
-        IActionTaskManager UnregisterTask<TAction, TData, TTask>();
+        IActionTaskOrchestrator UnregisterTask<TAction, TData, TTask>();
 
         /// <summary>
         /// Registers a profile-based task.
@@ -56,7 +56,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <param name="task">The task to register.</param>
         /// <param name="decoratorTypes">An array of decorator types to apply to the task.</param>
         /// <returns>A ProfileTaskBuilder instance for chaining further configuration.</returns>
-        ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, ITask<TData> task, params Type[] decoratorTypes);
+        ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, IActionTask<TData> task, params Type[] decoratorTypes);
 
         /// <summary>
         /// Registers a profile-based task with a condition.
@@ -67,7 +67,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <param name="predicate">A function to determine whether the task should be executed.</param>
         /// <param name="decoratorTypes">An array of decorator types to apply to the task.</param>
         /// <returns>A ProfileTaskBuilder instance for chaining further configuration.</returns>
-        ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, ITask<TData> task, Func<ActionEventArgs<TData>, bool> predicate = null, params Type[] decoratorTypes);
+        ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, IActionTask<TData> task, Func<ActionEventArgs<TData>, bool> predicate = null, params Type[] decoratorTypes);
 
         /// <summary>
         /// Registers a task pipeline for a specific action.
@@ -76,7 +76,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <typeparam name="TData">The type of the data payload.</typeparam>
         /// <param name="pipeline">The task pipeline to register.</param>
         /// <returns>The current IActionTaskManager instance.</returns>
-        IActionTaskManager RegisterPipeline<TAction, TData>(ITaskPipeline<TData> pipeline) where TAction : IActionTrigger<TData>;
+        IActionTaskOrchestrator RegisterPipeline<TAction, TData>(ITaskPipeline<TData> pipeline) where TAction : IActionTrigger<TData>;
 
         /// <summary>
         /// Registers or adds a task to an existing pipeline for a specific action.
@@ -86,7 +86,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <param name="task">The task to register or add.</param>
         /// <param name="priority">The priority order of the task in the pipeline.</param>
         /// <returns>The current IActionTaskManager instance.</returns>
-        IActionTaskManager RegisterOrAddTaskToPipeline<TAction, TData>(IChainableTask<TData> task, int priority = 0) where TAction : IActionTrigger<TData>;
+        IActionTaskOrchestrator RegisterOrAddTaskToPipeline<TAction, TData>(IPipelineTask<TData> task, int priority = 0) where TAction : IActionTrigger<TData>;
 
         /// <summary>
         /// Removes a task from a pipeline for a specific action.
@@ -103,7 +103,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <typeparam name="TData">The type of the data payload.</typeparam>
         /// <param name="existingTaskType">The type of the existing task to replace.</param>
         /// <param name="newTask">The new task to add to the pipeline.</param>
-        void ReplaceTaskInPipeline<TAction, TData>(Type existingTaskType, IChainableTask<TData> newTask) where TAction : IActionTrigger<TData>;
+        void ReplaceTaskInPipeline<TAction, TData>(Type existingTaskType, IPipelineTask<TData> newTask) where TAction : IActionTrigger<TData>;
 
         /// <summary>
         /// Links an action trigger to its corresponding tasks.

@@ -1,31 +1,32 @@
-﻿using Bjija.ActionTaskManager.Abstractions;
-using Bjija.ActionTaskManager.Decorators;
-using Bjija.ActionTaskManager.Exceptions;
-using Bjija.ActionTaskManager.Helpers;
-using Bjija.ActionTaskManager.Models;
+﻿using System.Collections.Concurrent;
+using Bjija.TaskOrchestrator.Abstractions;
+using Bjija.TaskOrchestrator.Decorators;
+using Bjija.TaskOrchestrator.Exceptions;
+using Bjija.TaskOrchestrator.Helpers;
+using Bjija.TaskOrchestrator.Models;
 
-namespace Bjija.ActionTaskManager
+namespace Bjija.TaskOrchestrator
 {
-    public class ActionTaskManager : IActionTaskManager
+    public class TaskOrchestrator : IActionTaskOrchestrator
     {
         private readonly List<Type> _universalDecorators = new();
-        private readonly Dictionary<Type, List<(Type TaskType, List<Type> DecoratorTypes)>> _configuration = new();
-        private readonly Dictionary<string, List<ITask>> _profileConfiguration = new();
+        private readonly ConcurrentDictionary<Type, List<(Type TaskType, List<Type> DecoratorTypes)>> _configuration = new();
+        private readonly Dictionary<string, List<IActionTask>> _profileConfiguration = new();
         private readonly Dictionary<Type, ITaskPipeline> _pipelines = new();
         private Dictionary<Type, Func<IActionEventArgs, bool>> _taskPredicates = new Dictionary<Type, Func<IActionEventArgs, bool>>();
 
-        private readonly ActionTaskManagerOptions _actionTaskManagerOptions;
+        private readonly TaskOrchestratorOptions _actionTaskManagerOptions;
         private readonly ITaskFactory _taskFactory;
         private readonly ITaskPipelineFactory _taskPipelineFactory;
 
-        public ActionTaskManager(ActionTaskManagerOptions actionTaskManagerOptions, ITaskFactory taskFactory, ITaskPipelineFactory taskPipelineFactory)
+        public TaskOrchestrator(TaskOrchestratorOptions actionTaskManagerOptions, ITaskFactory taskFactory, ITaskPipelineFactory taskPipelineFactory)
         {
             _actionTaskManagerOptions = actionTaskManagerOptions ?? throw new ArgumentNullException(nameof(actionTaskManagerOptions));
             _taskFactory = taskFactory ?? throw new ArgumentNullException(nameof(taskFactory));
             _taskPipelineFactory = taskPipelineFactory ?? throw new ArgumentNullException(nameof(taskPipelineFactory));
         }
 
-        public IActionTaskManager AddUniversalDecorator(Type decoratorType)
+        public IActionTaskOrchestrator AddUniversalDecorator(Type decoratorType)
         {
             if (decoratorType == null)
             {
@@ -40,16 +41,16 @@ namespace Bjija.ActionTaskManager
             return this;
         }
 
-        public IActionTaskManager Register<TAction, TData, TTask>(params Type[] decoratorTypes) 
+        public IActionTaskOrchestrator RegisterTask<TAction, TData, TTask>(params Type[] decoratorTypes) 
             where TAction : IActionTrigger<TData>
-            where TTask : ITask<TData>, new()
+            where TTask : IActionTask<TData>, new()
         {
-            return Register<TAction, TData, TTask>(null, decoratorTypes);
+            return RegisterTask<TAction, TData, TTask>(null, decoratorTypes);
         }
 
-        public IActionTaskManager Register<TAction, TData, TTask>(Func<ActionEventArgs<TData>, bool> predicate, params Type[] decoratorTypes)
+        public IActionTaskOrchestrator RegisterTask<TAction, TData, TTask>(Func<ActionEventArgs<TData>, bool>? predicate = null, params Type[] decoratorTypes)
             where TAction : IActionTrigger<TData>
-            where TTask : ITask<TData>, new()
+            where TTask : IActionTask<TData>, new()
         {
             predicate ??= _ => true;
             var actionType = typeof(TAction);
@@ -76,7 +77,7 @@ namespace Bjija.ActionTaskManager
             return this;
         }
 
-        public IActionTaskManager UnregisterTask<TAction, TData, TTask>()
+        public IActionTaskOrchestrator UnregisterTask<TAction, TData, TTask>()
         {
             var actionType = typeof(TAction);
             var taskType = typeof(TTask);
@@ -88,12 +89,12 @@ namespace Bjija.ActionTaskManager
             return this;
         }
 
-        public ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, ITask<TData> task, params Type[] decoratorTypes)
+        public ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, IActionTask<TData> task, params Type[] decoratorTypes)
         {
             return RegisterProfileTask(profileName, task, null, decoratorTypes);
         }
 
-        public ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, ITask<TData> task, Func<ActionEventArgs<TData>, bool> predicate, params Type[] decoratorTypes)
+        public ProfileTaskBuilder<TData> RegisterProfileTask<TData>(string profileName, IActionTask<TData> task, Func<ActionEventArgs<TData>, bool> predicate, params Type[] decoratorTypes)
         {
             if (string.IsNullOrEmpty(profileName))
             {
@@ -110,7 +111,7 @@ namespace Bjija.ActionTaskManager
             }
             else
             {
-                _profileConfiguration[profileName] = new List<ITask> { task };
+                _profileConfiguration[profileName] = new List<IActionTask> { task };
             }
 
             _taskPredicates[task.GetType()] = args =>
@@ -125,14 +126,14 @@ namespace Bjija.ActionTaskManager
             return new ProfileTaskBuilder<TData>(profileName, this);
         }
 
-        public IActionTaskManager RegisterPipeline<TAction, TData>(ITaskPipeline<TData> pipeline) where TAction : IActionTrigger<TData>
+        public IActionTaskOrchestrator RegisterPipeline<TAction, TData>(ITaskPipeline<TData> pipeline) where TAction : IActionTrigger<TData>
         {
             _pipelines[typeof(TAction)] = pipeline;
 
             return this;
         }
 
-        public IActionTaskManager RegisterOrAddTaskToPipeline<TAction, TData>(IChainableTask<TData> task, int priority = 0) where TAction : IActionTrigger<TData>
+        public IActionTaskOrchestrator RegisterOrAddTaskToPipeline<TAction, TData>(IPipelineTask<TData> task, int priority = 0) where TAction : IActionTrigger<TData>
         {
             if (!_pipelines.ContainsKey(typeof(TAction)))
             {
@@ -157,7 +158,7 @@ namespace Bjija.ActionTaskManager
             }
         }
 
-        public void ReplaceTaskInPipeline<TAction, TData>(Type existingTaskType, IChainableTask<TData> newTask) where TAction : IActionTrigger<TData>
+        public void ReplaceTaskInPipeline<TAction, TData>(Type existingTaskType, IPipelineTask<TData> newTask) where TAction : IActionTrigger<TData>
         {
             if (_pipelines.TryGetValue(typeof(TAction), out var pipeline))
             {
@@ -198,7 +199,7 @@ namespace Bjija.ActionTaskManager
             {
                 foreach (var taskBase in _profileConfiguration[profileName])
                 {
-                    if (taskBase is ITask<TData> task)
+                    if (taskBase is IActionTask<TData> task)
                     {
                         Func<ActionEventArgs<TData>, bool> predicate = null;
                         if (_taskPredicates.TryGetValue(task.GetType(), out var storedPredicate))
@@ -222,7 +223,7 @@ namespace Bjija.ActionTaskManager
             {
                 foreach (var (taskType, decoratorTypes) in _configuration[actionType])
                 {
-                    var taskInstance = _taskFactory.Create<ITask<TData>>(taskType);
+                    var taskInstance = _taskFactory.Create<IActionTask<TData>>(taskType);
                     taskInstance = DecorateTask(taskInstance, _universalDecorators.Concat(decoratorTypes));
 
                     Func<ActionEventArgs<TData>, bool> predicate = null;
@@ -244,11 +245,11 @@ namespace Bjija.ActionTaskManager
             return Task.CompletedTask;
         }
 
-        private ITask<TData> DecorateTask<TData>(ITask<TData> task, IEnumerable<Type> decoratorTypes)
+        private IActionTask<TData> DecorateTask<TData>(IActionTask<TData> task, IEnumerable<Type> decoratorTypes)
         {
             foreach (var decoratorType in decoratorTypes)
             {
-                task = _taskFactory.Create<ITask<TData>>(decoratorType, task);
+                task = _taskFactory.Create<IActionTask<TData>>(decoratorType, task);
             }
             return task;
         }

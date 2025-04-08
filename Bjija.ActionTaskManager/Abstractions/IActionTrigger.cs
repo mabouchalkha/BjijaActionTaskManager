@@ -1,4 +1,4 @@
-﻿using Bjija.ActionTaskManager.Models;
+﻿using Bjija.TaskOrchestrator.Models;
 
 /// <summary>
 /// Represents an action that can trigger one or more tasks.

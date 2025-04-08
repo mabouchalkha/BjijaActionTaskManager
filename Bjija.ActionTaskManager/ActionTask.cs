@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Models;
 
-namespace Bjija.ActionTaskManager
+namespace Bjija.TaskOrchestrator
 {
-    public abstract class Task<TData> : ITask<TData>
+    public abstract class ActionTask<TData> : IActionTask<TData>
     {
         public Predicate<ActionEventArgs<TData>> Predicate { get; protected set; }
 
-        public Task(Predicate<ActionEventArgs<TData>> predicate = null)
+        public ActionTask(Predicate<ActionEventArgs<TData>> predicate = null)
         {
             Predicate = predicate;
         }
@@ -25,5 +25,6 @@ namespace Bjija.ActionTaskManager
         }
 
         protected abstract Task ExecuteCoreAsync(ActionEventArgs<TData> args);
+
     }
 }

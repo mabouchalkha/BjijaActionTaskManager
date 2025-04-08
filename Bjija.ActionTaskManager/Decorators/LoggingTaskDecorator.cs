@@ -1,15 +1,15 @@
 ﻿using System.Text.Json;
-using Bjija.ActionTaskManager.Abstractions;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Abstractions;
+using Bjija.TaskOrchestrator.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Bjija.ActionTaskManager.Decorators
+namespace Bjija.TaskOrchestrator.Decorators
 {
     public class LoggingTaskDecorator<T> : TaskDecorator<T>
     {
         private readonly ILogger _logger;
 
-        public LoggingTaskDecorator(ITask<T> decoratedTask, ILogger<LoggingTaskDecorator<T>> logger)
+        public LoggingTaskDecorator(IActionTask<T> decoratedTask, ILogger<LoggingTaskDecorator<T>> logger)
             : base(decoratedTask)
         {
             _logger = logger;

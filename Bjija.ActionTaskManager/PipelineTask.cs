@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Models;
 
-namespace Bjija.ActionTaskManager
+namespace Bjija.TaskOrchestrator
 {
-    public abstract class ChainableTask<TData> : IChainableTask<TData>
+    public abstract class PipelineTask<TData> : IPipelineTask<TData>
     {
-        private IChainableTask<TData> _next;
+        private IPipelineTask<TData> _next;
 
         public Func<ActionEventArgs<TData>, bool> Predicate { get; set; }
 
-        public IChainableTask<TData> Next => _next;
+        public IPipelineTask<TData> Next => _next;
 
-        public IChainableTask<TData> SetNext(IChainableTask<TData> nextTask)
+        public IPipelineTask<TData> SetNext(IPipelineTask<TData> nextTask)
         {
             _next = nextTask;
             return _next;

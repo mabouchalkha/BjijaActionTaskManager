@@ -1,9 +1,9 @@
-﻿using Bjija.ActionTaskManager.Models;
+﻿using Bjija.TaskOrchestrator.Models;
 
 /// <summary>
 /// Represents a task that can be executed.
 /// </summary>
-public interface ITask
+public interface IActionTask
 {
 }
 
@@ -11,7 +11,7 @@ public interface ITask
 /// Represents a task that can be executed with a payload of type TData.
 /// </summary>
 /// <typeparam name="TData">The type of the payload data.</typeparam>
-public interface ITask<TData> : ITask
+public interface IActionTask<TData> : IActionTask
 {
     /// <summary>
     /// Gets the predicate used to determine whether the task should be executed.
@@ -30,19 +30,19 @@ public interface ITask<TData> : ITask
 /// Represents a chainable task that can be executed with a payload of type TData.
 /// </summary>
 /// <typeparam name="TData">The type of the payload data.</typeparam>
-public interface IChainableTask<TData> : ITask
+public interface IPipelineTask<TData> : IActionTask
 {
     /// <summary>
     /// Sets the next task in the chain.
     /// </summary>
     /// <param name="handler">The next task in the chain.</param>
     /// <returns>The current task.</returns>
-    IChainableTask<TData> SetNext(IChainableTask<TData> handler);
+    IPipelineTask<TData> SetNext(IPipelineTask<TData> handler);
 
     /// <summary>
     /// Gets the next task in the chain.
     /// </summary>
-    IChainableTask<TData> Next { get; }
+    IPipelineTask<TData> Next { get; }
 
     /// <summary>
     /// Gets or sets the predicate used to determine whether the task should be executed.

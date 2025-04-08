@@ -1,4 +1,4 @@
-﻿namespace Bjija.ActionTaskManager.Models
+﻿namespace Bjija.TaskOrchestrator.Models
 {
     /// <summary>
     /// Defines an interface for action event arguments that can hold shared data.
@@ -36,5 +36,4 @@
             Data = data;
         }
     }
-
 }

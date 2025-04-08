@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Models;
 
-namespace Bjija.ActionTaskManager.Abstractions
+namespace Bjija.TaskOrchestrator.Abstractions
 {
     /// <summary>
     /// Represents a task pipeline.
@@ -41,7 +41,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// <param name="task">The chainable task to register.</param>
         /// <param name="priority">The priority level of the task.</param>
         /// <param name="predicate">The predicate used to determine whether the task should be executed.</param>
-        void RegisterTask(IChainableTask<TData> task, int priority = 0, Func<ActionEventArgs<TData>, bool> predicate = null);
+        void RegisterTask(IPipelineTask<TData> task, int priority = 0, Func<ActionEventArgs<TData>, bool> predicate = null);
 
         /// <summary>
         /// Removes a task from the pipeline.
@@ -54,7 +54,7 @@ namespace Bjija.ActionTaskManager.Abstractions
         /// </summary>
         /// <param name="existingTaskType">The type of the existing task to replace.</param>
         /// <param name="newTask">The new task to add.</param>
-        void ReplaceTask(Type existingTaskType, IChainableTask<TData> newTask);
+        void ReplaceTask(Type existingTaskType, IPipelineTask<TData> newTask);
 
         /// <summary>
         /// Executes the task pipeline asynchronously.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bjija.ActionTaskManager.Exceptions
+namespace Bjija.TaskOrchestrator.Exceptions
 {
     public class PipelineNotFoundException : Exception
     {

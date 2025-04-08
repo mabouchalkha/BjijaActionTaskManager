@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bjija.ActionTaskManager.Abstractions;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Abstractions;
+using Bjija.TaskOrchestrator.Models;
 
-namespace Bjija.ActionTaskManager.Decorators
+namespace Bjija.TaskOrchestrator.Decorators
 {
     public interface IMetricsService
     {
@@ -17,7 +17,7 @@ namespace Bjija.ActionTaskManager.Decorators
     {
         private readonly IMetricsService _metricsService;
 
-        public MetricsCollectionTaskDecorator(ITask<T> decoratedTask, IMetricsService metricsService)
+        public MetricsCollectionTaskDecorator(IActionTask<T> decoratedTask, IMetricsService metricsService)
             : base(decoratedTask)
         {
             _metricsService = metricsService ?? throw new ArgumentNullException(nameof(metricsService));

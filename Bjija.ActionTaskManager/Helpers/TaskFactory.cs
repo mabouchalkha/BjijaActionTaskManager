@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Bjija.ActionTaskManager.Helpers
+namespace Bjija.TaskOrchestrator.Helpers
 {
     public interface ITaskFactory
     {

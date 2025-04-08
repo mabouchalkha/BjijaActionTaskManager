@@ -1,7 +1,7 @@
-﻿using Bjija.ActionTaskManager.Abstractions;
+﻿using Bjija.TaskOrchestrator.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Bjija.ActionTaskManager.Helpers
+namespace Bjija.TaskOrchestrator.Helpers
 {
     public interface ITaskPipelineFactory
     {

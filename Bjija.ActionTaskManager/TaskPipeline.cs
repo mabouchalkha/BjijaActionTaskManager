@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Bjija.ActionTaskManager.Abstractions;
-using Bjija.ActionTaskManager.Models;
+using Bjija.TaskOrchestrator.Abstractions;
+using Bjija.TaskOrchestrator.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Bjija.ActionTaskManager
+namespace Bjija.TaskOrchestrator
 {
     public class TaskPipeline<TData> : ITaskPipeline<TData>
     {
@@ -11,7 +11,7 @@ namespace Bjija.ActionTaskManager
         public Action<PipelineEventArgs<TData>> PipelineCompleted { get; set; }
         public Action<PipelineErrorEventArgs<TData>> PipelineFailed { get; set; }
 
-        private readonly SortedList<int, IChainableTask<TData>> _tasks = new();
+        private readonly SortedList<int, IPipelineTask<TData>> _tasks = new();
         private readonly ILogger<TaskPipeline<TData>> _logger;
 
         public TaskPipeline(ILogger<TaskPipeline<TData>> logger)
@@ -19,9 +19,9 @@ namespace Bjija.ActionTaskManager
             _logger = logger;
         }
 
-        public void RegisterTask(IChainableTask<TData> task, int priority = 0, Func<ActionEventArgs<TData>, bool> predicate = null)
+        public void RegisterTask(IPipelineTask<TData> task, int priority = 0, Func<ActionEventArgs<TData>, bool> predicate = null)
         {
-            task.Predicate = predicate;
+            task.Predicate = predicate ?? (_ => true);
             _tasks.Add(priority, task);
         }
 
@@ -31,7 +31,7 @@ namespace Bjija.ActionTaskManager
             _tasks.Remove(key);
         }
 
-        public void ReplaceTask(Type existingTaskType, IChainableTask<TData> newTask)
+        public void ReplaceTask(Type existingTaskType, IPipelineTask<TData> newTask)
         {
             var key = _tasks.Keys.First(k => _tasks[k].GetType() == existingTaskType);
             _tasks[key] = newTask;
@@ -46,33 +46,35 @@ namespace Bjija.ActionTaskManager
             {
                 PipelineStarted?.Invoke(new PipelineEventArgs<TData>(args.Data));
 
-                IChainableTask<TData> firstTask = null;
-                IChainableTask<TData> lastTask = null;
-
-                foreach (var task in _tasks.Values.OfType<IChainableTask<TData>>())
+                // Optimization: avoid unnecessary LINQ operations and improve performance
+                var tasksCount = _tasks.Count;
+                if (tasksCount == 0)
                 {
-                    if (firstTask == null)
-                    {
-                        firstTask = task;
-                        lastTask = task;
-                    }
-                    else
-                    {
-                        lastTask = lastTask.SetNext(task);
-                    }
+                    PipelineCompleted?.Invoke(new PipelineEventArgs<TData>(args.Data));
+                    return;
                 }
 
-                if (firstTask != null)
+                // Get the tasks in priority order
+                var orderedTasks = _tasks.Values.ToArray();
+
+                // Set up the chain
+                var firstTask = orderedTasks[0];
+                var currentTask = firstTask;
+
+                for (int i = 1; i < orderedTasks.Length; i++)
                 {
-                    await firstTask.ExecuteChainAsync(args);
+                    currentTask = currentTask.SetNext(orderedTasks[i]);
                 }
+
+                // Execute the chain
+                await firstTask.ExecuteChainAsync(args);
 
                 PipelineCompleted?.Invoke(new PipelineEventArgs<TData>(args.Data));
             }
             catch (Exception ex)
             {
                 PipelineFailed?.Invoke(new PipelineErrorEventArgs<TData>(args.Data, ex));
-                _logger.LogError(ex, "Error executing task: {TaskName}", ex.ToString());
+                _logger.LogError(ex, "Error executing task: {TaskName}", ex.Message);
                 // TODO: Handle error, e.g., rollback transaction
                 throw;
             }
